@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Net;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace anticapcha1
 {
@@ -19,6 +20,12 @@ namespace anticapcha1
         public static List<Rectangle> Coordinates { get; private set; } = new List<Rectangle>();
         private static List<uint> CurrentHashes = new List<uint>();
         private static Dictionary<uint, char> Hashes = new Dictionary<uint, char>();
+
+        static Anticapcha()
+        {
+            if (File.Exists("Hashes.txt"))
+                Hashes = JsonConvert.DeserializeObject<Dictionary<uint, char>>(File.ReadAllText("Hashes.txt"));
+        }
 
         public static bool NewCapcha()
         {
@@ -51,6 +58,8 @@ namespace anticapcha1
                 char[] charArray = text.ToCharArray();
                 for (int i = 0; i < charArray.Length; i++)
                         Hashes[CurrentHashes[i]] = charArray[i];
+
+                File.WriteAllText("Hashes.txt", JsonConvert.SerializeObject(Hashes, Formatting.Indented));
             }
         }
 
